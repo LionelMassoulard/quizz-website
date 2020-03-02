@@ -47,8 +47,8 @@ def index():
     
     return "Welcome" 
 
-@app.route('/quiz/<int:nb>')
-def quiz(nb):
+@app.route('/quiz/<category>/<int:nb>')
+def quiz(category, nb):
     all_positions = get_grid(**configuration)
     if nb > len(blasons) - 1:
         nb = -1
@@ -60,12 +60,14 @@ def quiz(nb):
     black_order = [int(b) for b in black_order]
     
 
+    blason_name = BLASONS[category][nb]
     return flask.render_template('quiz.html',
                                  nb_blacks=nb_blacks,
                                  all_positions=all_positions,
-                                 blason_name=blasons[nb],
-                                 blason_link=INV_MAPPING[blasons[nb]],
+                                 blason_name=blason_name,
+                                 blason_link=INV_MAPPING[category][blason_name],
                                  nb=nb,
+                                 category=category,
                                  black_order=black_order,
                                  **configuration)
 
@@ -88,9 +90,14 @@ if False:
         
     
 def load_mapping():
-    df = pd.read_csv(".\mapping.csv")
-    mapping = {base_name:cleaned_name for base_name, cleaned_name in zip(df["base_name"], df["cleaned_name"])}
-    inv_mapping = {v:k for k,v in mapping.items()}
+    df = pd.read_csv(".\mapping.csv", encoding="utf-8", sep=",")
+    df.loc[df["category"].isnull(), "category"] = "hard"
+
+    mapping = {}
+    inv_mapping = {}    
+    for g, group in df.groupby("category"):
+        mapping[g] = {base_name:cleaned_name for base_name, cleaned_name in zip(group["base_name"], group["cleaned_name"])}
+        inv_mapping[g] = {v:k for k,v in mapping[g].items()}
     return mapping, inv_mapping
 
 
@@ -104,16 +111,19 @@ def load_mapping():
 
 if __name__ == '__main__':
     
-    MAPPING, INV_MAPPING = load_mapping()
+    _ , INV_MAPPING = load_mapping()
     SEED = 123
-    
-    order = np.arange(len(INV_MAPPING.keys()))
+
     np.random.seed(SEED)
-    
-    blasons = list(INV_MAPPING.keys())
-    order   = np.arange(len(blasons))
-    np.random.shuffle(order)
-    order   = list(order)
+    BLASONS = {}
+    for k, v in INV_MAPPING.items():
         
+        blasons = list(v)
+        order   = np.arange(len(blasons))
+        np.random.shuffle(order)
+        order   = list(order)
+        blasons = [blasons[o] for o in order]
+        BLASONS[k] = blasons
+    
     app.debug=True
     app.run()

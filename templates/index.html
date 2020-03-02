@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<style>
+	div.container {
+	  position: relative;
+	} 
+{%for pos in all_positions%}
+
+	img.black_{{pos.ind}} {
+	  position: absolute;
+	  top: {{pos.top}}px;
+	  left: {{pos.left}}px;
+	  height:{{black_height}}px;
+	  width:{{black_width}}px;
+	  z-index:2;
+	  opacity:1;
+	  }
+{%endfor%}
+
+	img.blason {
+	  position: absolute;
+	  top: 0px;
+	  left: 0px;
+	  height:{{img_height}}px;
+	  width:{{img_widht}}px;
+	  z-index:1;
+	}
+	
+</style>
+
+<script type="text/javascript">
+	function hide_element(id) {
+		var p = document.getElementById(id);
+		
+		p.style.opacity = "0"
+	}
+</script>
+
+  <meta charset="utf-8" />
+  <title>Quizz Blasons</title>
+    <!--<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">-->
+	
+</head>
+<body>
+
+<header>
+<h1>Devinez le blason</h1>
+</header>
+
+<div class="container">
+	{%for pos in all_positions%}
+		<img class="black_{{pos.ind}}" id="black_{{pos.ind}}" src="/static/black.jpg" onclick="hide_element('black_{{pos.ind}}')">
+	{%endfor%}
+	<img class="blason" 
+		src="/static/Blason-veneur-2014-v01-256px.png"
+		>
+</div>
+
+<div>Afficher la réponse?</div>
+
+<!--width="64" height="64">
+		width="{{IMG_WIDTH}}"
+		height="{{IMG_HEIGHT}}">
+-->		
+</body>
+</html>

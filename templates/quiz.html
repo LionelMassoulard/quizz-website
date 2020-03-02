@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<style>
+	div.container {
+	  position: relative;
+	} 
+	
+	div.rest {
+		position: absolute;
+		top:{{img_height + 2*black_height}}px;
+	}
+{%for pos in all_positions%}
+
+	img.black_{{pos.ind}} {
+	  position: absolute;
+	  top: {{pos.top}}px;
+	  left: {{pos.left}}px;
+	  height:{{black_height}}px;
+	  width:{{black_width}}px;
+	  z-index:2;
+	  opacity:1;
+	  }
+{%endfor%}
+
+	div.blason_name {
+		opacity:0;
+	}
+
+	img.blason {
+	  position: absolute;
+	  top: 0px;
+	  left: 0px;
+	  height:{{img_height}}px;
+	  width:{{img_widht}}px;
+	  z-index:1;
+	}
+	
+</style>
+
+<script type="text/javascript">
+
+	var random_index=0;
+	var black_order = {{black_order |tojson}};
+	
+	function hide_random() {
+		var to_hide = black_order[random_index]
+		hide_element("black_" + to_hide);
+		//console.log(random_index);
+		random_index+=1;
+	}
+	
+	function hide_element(id) {		
+		//random_index+=1;
+
+		var p = document.getElementById(id);
+		p.style.opacity = "0";
+	}
+	
+	function hide_all() {
+		var i;
+		for (i = 0; i<{{nb_blacks}}; i++) {
+			hide_element("black_" + i);
+		}
+	}
+	
+	function show_response() {
+		show_element('blason_name');
+		hide_all();
+	}
+	
+	function show_element(id) {
+		//console.log(random_index);
+		var p = document.getElementById(id);
+		p.style.opacity = "1";
+	}
+</script>
+
+  <meta charset="utf-8" />
+  <title>Quizz Blasons</title>
+    <!--<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">-->
+	
+</head>
+<body>
+
+<header>
+<h1>Devinez le blason</h1>
+</header>
+
+<div class="container">
+	{%for pos in all_positions%}
+		<img class="black_{{pos.ind}}" id="black_{{pos.ind}}" src="/static/black.jpg" onclick="hide_element('black_{{pos.ind}}')">
+	{%endfor%}
+	<img class="blason" 
+		src="/static/{{blason_link}}"
+		>
+</div>
+
+<div class="rest">
+	<a href="#" onclick="show_response()">
+		<div id="response">Afficher la réponse?</div>
+	</a>
+	<h1>
+	<div class="blason_name" id="blason_name">{{blason_name}}</div>
+	</h1>
+	<a href="/quiz/{{nb+1}}">
+		<div class="response">On teste le prochain?</div>
+	</a>
+	
+	<a href="#" onclick="hide_random()">
+		<div>Enlever un élément au hasard</div>
+	</a>
+	
+</div>
+
+
+<!--width="64" height="64">
+		width="{{IMG_WIDTH}}"
+		height="{{IMG_HEIGHT}}">
+-->		
+</body>
+</html>
